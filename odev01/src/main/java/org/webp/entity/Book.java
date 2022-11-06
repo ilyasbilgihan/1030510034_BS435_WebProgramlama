@@ -1,13 +1,12 @@
 package org.webp.entity;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Future;
+import java.util.Date;
 
 @Entity
 public class Book {
@@ -28,7 +27,13 @@ public class Book {
     @NotNull
     private Author author;
 
-    public Book() {}
+    @OneToOne
+    private Member borrower;
+
+    @Future
+    private Date borrowedUntil;
+
+    public Book() { }
 
     public Long getId() { return id; }
 
@@ -45,4 +50,12 @@ public class Book {
     public Author getAuthor() { return author; }
 
     public void setAuthor(Author author) { this.author = author; }
+
+    public Member getBorrower() { return borrower; }
+
+    public void setBorrower(Member member) { this.borrower = member; }
+
+    public Date getBorrowedUntil() { return borrowedUntil; }
+
+    public void setBorrowedUntil(Date date){ this.borrowedUntil = date; }
 }

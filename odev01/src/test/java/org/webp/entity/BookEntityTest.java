@@ -15,12 +15,10 @@ public class BookEntityTest extends EntityTestBase {
     @Test
     public void testBook(){
 
-        Section section = new Section();
-        section.setName("Sci-Fi");
+        Section section = createSection("Sci-Fi");
         assertTrue(persistInATransaction(section));
 
-        Author author = new Author();
-        author.setName("Isac Asimov");
+        Author author = createAuthor("Isac Asimov", past);
         assertTrue(persistInATransaction(author));
 
 
@@ -40,7 +38,7 @@ public class BookEntityTest extends EntityTestBase {
 
         //error due to long name
         Book book3 = new Book();
-        book3.setName(new String(new char[257]));
+        book3.setName(longName(257));
         book3.setAuthor(author);
         book3.setSection(section);
         assertFalse(persistInATransaction(book3));
@@ -52,23 +50,6 @@ public class BookEntityTest extends EntityTestBase {
         book4.setAuthor(author);
         book4.setSection(section);
         assertTrue(persistInATransaction(book4));
-
-    }
-
-    private void createBook(String name, Author author, Section section){
-
-
-        Book book = new Book();
-        book.setName(name);
-        book.setSection(section);
-        book.setAuthor(author);
-
-        persistInATransaction(book);
-
-        section.getBooks().add(book);
-        author.getBooks().add(book);
-
-        persistInATransaction(section, author);
 
     }
 
@@ -91,21 +72,13 @@ public class BookEntityTest extends EntityTestBase {
         */
 
         // Sections
-        Section sA = new Section();
-        sA.setName("sA");
-
-        Section sB = new Section();
-        sB.setName("sB");
+        Section sA = createSection("sA");
+        Section sB = createSection("sB");
 
         // Authors
-        Author aA = new Author();
-        aA.setName("aA");
-
-        Author aB = new Author();
-        aB.setName("aB");
-
-        Author aC = new Author();
-        aC.setName("aC");
+        Author aA = createAuthor("aA", past);
+        Author aB = createAuthor("aB", past);
+        Author aC = createAuthor("aC", past);
 
         assertTrue(persistInATransaction(sA, sB, aA, aB, aC));
 

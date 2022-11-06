@@ -2,44 +2,55 @@ package org.webp.entity;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Date;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AuthorEntityTest extends EntityTestBase {
 
     @Test
-    public void testTooLongName(){
-
-        String name = new String(new char[129]);
-
-        //error due to long name
-        Author author1 = new Author();
-        author1.setName(name);
-        assertFalse(persistInATransaction(author1));
+    public void testValidName(){
 
         //error due to null name
-        Author author2 = new Author();
-        assertFalse(persistInATransaction(author2));
+        assertFalse(persistInATransaction(createAuthor(null, past)));
+
+        //error due to blank name
+        assertFalse(persistInATransaction(createAuthor("", past)));
+
+        //error due to long name
+        assertFalse(persistInATransaction(createAuthor(longName(129), past)));
 
         //no error
-        Author author3 = new Author();
-        author3.setName("foo");
-        assertTrue(persistInATransaction(author3));
+        assertTrue(persistInATransaction(createAuthor("foo", past)));
+
+        //no error when duplicate names
+        assertTrue(persistInATransaction(createAuthor("foo", new Date())));
     }
 
     @Test
-    public void testUniqueAuthor(){
+    public void testValidBirthDate(){
 
-        String name = "bar";
+        Date future = new Date(new Date().getTime() + 1000*60*60*24*7); // one week after
 
-        Author author = new Author();
-        author.setName(name);
+        assertFalse(persistInATransaction(createAuthor("foo", future)));
+        assertTrue(persistInATransaction(createAuthor("foo", new Date())));
+        assertTrue(persistInATransaction(createAuthor("foo", past)));
 
-        assertTrue(persistInATransaction(author));
-
-        Author another = new Author();
-        another.setName(name);
-
-        assertFalse(persistInATransaction(another));
     }
+
+    @Test
+    public void testBio(){
+
+        //no error with null bio
+        assertTrue(persistInATransaction(createAuthor("a", past)));
+        //no error with blank bio
+        assertTrue(persistInATransaction(createAuthor("a", past, "")));
+        //no error between 0-1024 chars
+        assertTrue(persistInATransaction(createAuthor("a", past, longName(1024))));
+        //error when more than 1024 chars
+        assertFalse(persistInATransaction(createAuthor("a", past, longName(1025))));
+
+    }
+
 }
