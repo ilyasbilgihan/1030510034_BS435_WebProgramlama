@@ -53,32 +53,36 @@ public class EJBInJEEContainerTest {
         assertThrows(EJBException.class, ()-> authorBean.getAllAuthors(false));
         assertThrows(EJBException.class, ()-> memberBean.getAllMembers());
         assertThrows(EJBException.class, ()-> sectionBean.getAllSections(false));
+        assertThrows(EJBException.class, ()-> bookBean.getAllBooks());
 
         // create entities
         Long aID = authorBean.createAuthor(aName, past);
         Long mID = memberBean.createMember(mName);
         Long sID = sectionBean.createSection(sName);
+        Long bID = bookBean.createBook(bName, aID, sID);
 
         // trying to create section with same name
         assertThrows(EJBException.class, ()-> sectionBean.createSection(sName));
+		
+		// author is not available for creating book
+        assertThrows(EJBException.class, ()-> bookBean.createBook(bName, 9999, sID));
+	
+		// section is not available for creating book
+        assertThrows(EJBException.class, ()-> bookBean.createBook(bName, aID, 9999));
 
 
         assertEquals(1, authorBean.getAllAuthors(false).size());
         assertEquals(1, memberBean.getAllMembers().size());
         assertEquals(1, sectionBean.getAllSections(false).size());
+        assertEquals(1, bookBean.getAllBooks().size());
 
         assertEquals(aName, authorBean.getAuthor(aID, false).getName());
         assertEquals(mName, memberBean.getMember(mID).getName());
         assertEquals(sName, sectionBean.getSection(sID, false).getName());
-
-
-        assertThrows(EJBException.class, ()-> bookBean.getAllBooks());
-        assertThrows(EJBException.class, ()-> bookBean.createBook(bName, 9999, 9999));
-
-        Long bID = bookBean.createBook(bName, aID, sID);
-
-        assertEquals(1, bookBean.getAllBooks().size());
         assertEquals(bName, bookBean.getBook(bID).getName());
+
+
+
 
 
     }
